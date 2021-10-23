@@ -7,7 +7,12 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        CorridorItem.cpp \
+        DisplayView.cpp \
+        DisplayWidget.cpp \
+        FlatItem.cpp \
         MainWindow.cpp \
+        OptionsWidget.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -16,4 +21,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    MainWindow.h
+    CorridorItem.h \
+    DisplayView.h \
+    DisplayWidget.h \
+    FlatItem.h \
+    MainWindow.h \
+    OptionsWidget.h

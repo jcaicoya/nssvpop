@@ -2,6 +2,10 @@
 
 #include <QMainWindow>
 
+class OptionsWidget;
+class DisplayWidget;
+
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -10,5 +14,9 @@ public:
 
 signals:
 
+
+private:
+    OptionsWidget *options_widget_;
+    DisplayWidget *display_widget_;
 };
 
