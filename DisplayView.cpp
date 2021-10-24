@@ -1,64 +1,180 @@
 #include "DisplayView.h"
 #include "CorridorItem.h"
 #include "FlatItem.h"
+#include "FlatsState.h"
+#include "DisplayViewConstants.h"
 #include <QDebug>
+#include <QKeyEvent>
+#if QT_CONFIG(wheelevent)
+#include <QWheelEvent>
+#endif
+
+
+using namespace DisplayViewConstants;
 
 
 DisplayView::DisplayView(QWidget *parent)
     : QGraphicsView(parent)
     , scene_(nullptr)
-    , corridor_list_()
+    , corridor_item_(nullptr)
     , flat_list_()
+    , corridor_width_(200)
 {
     scene_ = new QGraphicsScene(this);
     scene_->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene_->setSceneRect(-10, -300, 500, 600);
+    scene_->setSceneRect(scene_x_origin_, scene_y_origin_, scene_width_, scene_heigh_);
     setScene(scene_);
 
     setCacheMode(QGraphicsView::CacheBackground);
     setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
-    //setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    //scale(qreal(0.8), qreal(0.8));
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    scale(qreal(0.6), qreal(0.6));
     setMinimumSize(800, 800);
 
-    constexpr int corridor_x = 0;
-    constexpr int corridor_y = -25;
-    constexpr int corridor_width = 500;
-    constexpr int corridor_height = 50;
-    CorridorItem *corridor_item = new CorridorItem(QRect(corridor_x, corridor_y, corridor_width, corridor_height));
-    corridor_list_.append(corridor_item);
+    corridor_item_ = new CorridorItem(corridor_width_);
+    scene_->addItem(corridor_item_);
 
-    constexpr int number_of_upper_flats = 5;
-    constexpr int flats_initial_x = corridor_x;
-    constexpr int flats_width = corridor_width / number_of_upper_flats;
-    constexpr int flats_height = 300;
-    constexpr int upper_flats_y = -corridor_height - flats_height;
-    constexpr int botton_flats_y = corridor_height;
-    for (int ii=0; ii<number_of_upper_flats; ii++)
-    {
-        FlatItem *upper_flat_item = new FlatItem(QRect(flats_initial_x + ii*flats_width, upper_flats_y, flats_width, flats_height));
-        flat_list_.append(upper_flat_item);
-        FlatItem *botton_flat_item = new FlatItem(QRect(flats_initial_x + ii*flats_width, botton_flats_y, flats_width, flats_height));
-        flat_list_.append(botton_flat_item);
-    }
+    calculate_flats();
 
     display();
 }
 
 
+void DisplayView::zoom_in()
+{
+    scale_view(qreal(1.2));
+}
+
+
+void DisplayView::zoom_out()
+{
+    scale_view(1 / qreal(1.2));
+}
+
+
+void DisplayView::set_corridor_width(int width)
+{
+//    if ((width < 10) or (width > 1000))
+//    {
+//        return;
+//    }
+
+//    if (corridor_width_ == width)
+//    {
+//        return;
+//    }
+
+//    corridor_width_ = width;
+
+//    calculate_flats();
+}
+
+
+void DisplayView::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key()) {
+//    case Qt::Key_Up:
+//        centerNode->moveBy(0, -20);
+//        break;
+//    case Qt::Key_Down:
+//        centerNode->moveBy(0, 20);
+//        break;
+//    case Qt::Key_Left:
+//        centerNode->moveBy(-20, 0);
+//        break;
+//    case Qt::Key_Right:
+//        centerNode->moveBy(20, 0);
+//        break;
+    case Qt::Key_Plus:
+        zoom_in();
+        break;
+    case Qt::Key_Minus:
+        zoom_out();
+        break;
+//    case Qt::Key_Space:
+//    case Qt::Key_Enter:
+//        shuffle();
+        break;
+    default:
+        QGraphicsView::keyPressEvent(event);
+    }
+}
+
+
+void DisplayView::drawBackground(QPainter *painter, const QRectF &rect)
+{
+    QRectF sceneRect = this->sceneRect();
+    QLinearGradient gradient(sceneRect.topLeft(), sceneRect.bottomRight());
+    gradient.setColorAt(0, Qt::white);
+    gradient.setColorAt(1, Qt::lightGray);
+    painter->fillRect(rect.intersected(sceneRect), gradient);
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(sceneRect);
+}
+
+
+void DisplayView::scale_view(qreal scaleFactor)
+{
+    qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
+    if (factor < 0.2 || factor > 50)
+    {
+        return;
+    }
+
+    scale(scaleFactor, scaleFactor);
+}
+
+#if QT_CONFIG(wheelevent)
+void DisplayView::wheelEvent(QWheelEvent *event)
+{
+    scale_view(pow(2., -event->angleDelta().y() / 240.0));
+}
+#endif
+
+
+void DisplayView::calculate_flats()
+{
+    int number_of_upper_flats = corridor_width_ / flat_width_;
+    int leftover_space = corridor_width_ - (flat_width_ + separation_between_flats_) * number_of_upper_flats;
+
+    if (leftover_space < 0)
+    {
+        number_of_upper_flats--;
+        leftover_space = corridor_width_ - (flat_width_ + separation_between_flats_) * number_of_upper_flats;
+    }
+
+    if (0 == leftover_space)
+    {
+        FlatsState::distribution_is_optimal_ = true;
+    }
+    else
+    {
+        FlatsState::distribution_is_optimal_ = false;
+    }
+
+    int flats_x = corridor_x_origin_ + leftover_space / 2;
+    for (int ii=0; ii<number_of_upper_flats; ii++)
+    {
+        FlatItem *upper_flat_item = new FlatItem(flats_x, upper_flats_y_origin_);
+        qDebug() << "upper_flat " << ii << ": " << flats_x
+                 << ", " << upper_flats_y_origin_
+                 << ", " << flats_x + flat_width_
+                 << ", " << upper_flats_y_origin_ + flat_height_;
+        flat_list_.append(upper_flat_item);
+        FlatItem *botton_flat_item = new FlatItem(flats_x, lower_flats_y_origin_);
+        flat_list_.append(botton_flat_item);
+        flats_x += flat_width_ + separation_between_flats_;
+    }
+}
+
+
 void DisplayView::display()
 {
-    for (auto corridor: corridor_list_)
-    {
-        scene_->addItem(corridor);
-    }
+    //scene_->clear();
 
     for (auto flat: flat_list_)
     {
         scene_->addItem(flat);
     }
-
-    qDebug() << corridor_list_;
-    qDebug() << flat_list_;
 }

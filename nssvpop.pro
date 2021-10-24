@@ -11,6 +11,7 @@ SOURCES += \
         DisplayView.cpp \
         DisplayWidget.cpp \
         FlatItem.cpp \
+        FlatsState.cpp \
         MainWindow.cpp \
         OptionsWidget.cpp \
         main.cpp
@@ -23,7 +24,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     CorridorItem.h \
     DisplayView.h \
+    DisplayViewConstants.h \
     DisplayWidget.h \
     FlatItem.h \
+    FlatsState.h \
     MainWindow.h \
     OptionsWidget.h

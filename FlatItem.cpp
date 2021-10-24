@@ -1,10 +1,15 @@
 #include "FlatItem.h"
+#include "DisplayViewConstants.h"
+#include "FlatsState.h"
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
 
-FlatItem::FlatItem(const QRect& rect)
-    : QGraphicsRectItem(rect)
+using namespace DisplayViewConstants;
+
+
+FlatItem::FlatItem(int x, int y, QGraphicsItem *parent)
+    : QGraphicsRectItem(x, y, flat_width_, flat_height_, parent)
 {
     setFlag(ItemIsSelectable);
     setFlag(ItemSendsGeometryChanges);
@@ -22,8 +27,12 @@ void FlatItem::paint(QPainter *painter, [[maybe_unused]] const QStyleOptionGraph
     {
         painter->fillRect(boundingRect(), Qt::blue);
     }
+    else if (FlatsState::distribution_is_optimal_)
+    {
+        painter->fillRect(boundingRect(), Qt::green);
+    }
     else
     {
-        painter->fillRect(boundingRect(), Qt::yellow);
+        painter->fillRect(boundingRect(), Qt::darkRed);
     }
 }

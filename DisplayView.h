@@ -15,12 +15,27 @@ class DisplayView : public QGraphicsView
 public:
     explicit DisplayView(QWidget *parent = nullptr);
 
+public slots:
+    void zoom_in();
+    void zoom_out();
+    void set_corridor_width(int width);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+#if QT_CONFIG(wheelevent)
+    void wheelEvent(QWheelEvent *event) override;
+#endif
+    void drawBackground(QPainter *painter, const QRectF &rect) override;
+
+    void scale_view(qreal scaleFactor);
 
 private:
     QGraphicsScene *scene_;
-    QList<CorridorItem *> corridor_list_;
+    CorridorItem * corridor_item_;
     QList<FlatItem *> flat_list_;
+    int corridor_width_;
 
+    void calculate_flats();
     void display();
 };
 
