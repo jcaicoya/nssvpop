@@ -2,6 +2,7 @@
 #include "DisplayView.h"
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QDebug>
 
 
 DisplayWidget::DisplayWidget(QWidget *parent)
@@ -16,4 +17,15 @@ DisplayWidget::DisplayWidget(QWidget *parent)
     display_layout->addWidget(display_view_);
 
     setLayout(display_layout);
+
+    connect(this, &DisplayWidget::corridor_width_value_changed,
+            display_view_, &DisplayView::corridor_width_value_changed_handler);
+}
+
+
+void DisplayWidget::corridor_width_value_changed_handler(int width)
+{
+    qDebug() << "DisplayWidget receiving corridor_width_value_changed_handler(" << width
+             << ")\nand emiting corridor_width_value_changed(" << width << ")";
+    emit corridor_width_value_changed(width);
 }

@@ -18,7 +18,7 @@ public:
 public slots:
     void zoom_in();
     void zoom_out();
-    void set_corridor_width(int width);
+    void corridor_width_value_changed_handler(int width);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

@@ -18,5 +18,7 @@ signals:
 private:
     OptionsWidget *options_widget_;
     DisplayWidget *display_widget_;
+
+    void create_actions();
 };
 

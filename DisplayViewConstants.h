@@ -9,6 +9,10 @@ namespace DisplayViewConstants
     static constexpr int scene_x_middle_ = scene_x_origin_ + scene_width_ / 2;
     static constexpr int scene_y_middle_ = scene_y_origin_ + scene_heigh_ / 2;
 
+    static constexpr int minimum_corridor_width_ = 100;
+    static constexpr int default_corridor_width_ = 300;
+    static constexpr int maximum_corridor_width = 1000;
+
     static constexpr int corridor_height_ = 50;
     static constexpr int corridor_x_origin_ = 10;
     static constexpr int corridor_y_origin_ = scene_y_middle_ - corridor_height_ / 2;

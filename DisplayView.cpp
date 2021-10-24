@@ -18,7 +18,7 @@ DisplayView::DisplayView(QWidget *parent)
     , scene_(nullptr)
     , corridor_item_(nullptr)
     , flat_list_()
-    , corridor_width_(200)
+    , corridor_width_(default_corridor_width_)
 {
     scene_ = new QGraphicsScene(this);
     scene_->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -29,7 +29,7 @@ DisplayView::DisplayView(QWidget *parent)
     setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    scale(qreal(0.6), qreal(0.6));
+    scale(qreal(0.8), qreal(0.8));
     setMinimumSize(800, 800);
 
     corridor_item_ = new CorridorItem(corridor_width_);
@@ -52,22 +52,20 @@ void DisplayView::zoom_out()
     scale_view(1 / qreal(1.2));
 }
 
-
-void DisplayView::set_corridor_width(int width)
+void DisplayView::corridor_width_value_changed_handler(int width)
 {
-//    if ((width < 10) or (width > 1000))
-//    {
-//        return;
-//    }
+    if (corridor_width_ == width)
+    {
+        return;
+    }
 
-//    if (corridor_width_ == width)
-//    {
-//        return;
-//    }
+    corridor_width_ = width;
 
-//    corridor_width_ = width;
+    auto rect = corridor_item_->rect();
+    rect.setWidth(corridor_width_);
+    corridor_item_->setRect(rect);
 
-//    calculate_flats();
+    calculate_flats();
 }
 
 
@@ -135,6 +133,13 @@ void DisplayView::wheelEvent(QWheelEvent *event)
 
 void DisplayView::calculate_flats()
 {
+    for (auto flat_item: flat_list_)
+    {
+        scene_->removeItem(flat_item);
+    }
+
+    flat_list_.clear();
+
     int number_of_upper_flats = corridor_width_ / flat_width_;
     int leftover_space = corridor_width_ - (flat_width_ + separation_between_flats_) * number_of_upper_flats;
 
@@ -157,14 +162,15 @@ void DisplayView::calculate_flats()
     for (int ii=0; ii<number_of_upper_flats; ii++)
     {
         FlatItem *upper_flat_item = new FlatItem(flats_x, upper_flats_y_origin_);
-        qDebug() << "upper_flat " << ii << ": " << flats_x
-                 << ", " << upper_flats_y_origin_
-                 << ", " << flats_x + flat_width_
-                 << ", " << upper_flats_y_origin_ + flat_height_;
         flat_list_.append(upper_flat_item);
         FlatItem *botton_flat_item = new FlatItem(flats_x, lower_flats_y_origin_);
         flat_list_.append(botton_flat_item);
         flats_x += flat_width_ + separation_between_flats_;
+    }
+
+    for (auto flat_item: flat_list_)
+    {
+        scene_->addItem(flat_item);
     }
 }
 
