@@ -36,8 +36,6 @@ DisplayView::DisplayView(QWidget *parent)
     scene_->addItem(corridor_item_);
 
     calculate_flats();
-
-    display();
 }
 
 
@@ -171,16 +169,5 @@ void DisplayView::calculate_flats()
     for (auto flat_item: flat_list_)
     {
         scene_->addItem(flat_item);
-    }
-}
-
-
-void DisplayView::display()
-{
-    //scene_->clear();
-
-    for (auto flat: flat_list_)
-    {
-        scene_->addItem(flat);
     }
 }

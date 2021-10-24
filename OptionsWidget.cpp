@@ -26,9 +26,7 @@ OptionsWidget::OptionsWidget(QWidget *parent)
     corridor_width_layout->addWidget(corridor_width_sping_box_);
 
     connect(corridor_width_sping_box_, QOverload<int>::of(&QSpinBox::valueChanged),
-            [=](int width){
-        qDebug() << "OptionsWidget emiting corridor_width_value_changed(" << width << ")";
-        emit corridor_width_value_changed(width); });
+            [=](int width){ emit corridor_width_value_changed(width); });
 
     QVBoxLayout *options_layout = new QVBoxLayout;
     options_layout->addWidget(more_things_label);

@@ -36,6 +36,5 @@ private:
     int corridor_width_;
 
     void calculate_flats();
-    void display();
 };
 
