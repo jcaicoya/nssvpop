@@ -3,6 +3,7 @@
 #include "FlatItem.h"
 #include "FlatsState.h"
 #include "DisplayViewConstants.h"
+#include <cmath>
 #include <QDebug>
 #include <QKeyEvent>
 #if QT_CONFIG(wheelevent)
@@ -124,7 +125,7 @@ void DisplayView::scale_view(qreal scaleFactor)
 #if QT_CONFIG(wheelevent)
 void DisplayView::wheelEvent(QWheelEvent *event)
 {
-    scale_view(pow(2., -event->angleDelta().y() / 240.0));
+    scale_view(std::pow(2., -event->angleDelta().y() / 240.0));
 }
 #endif
 
